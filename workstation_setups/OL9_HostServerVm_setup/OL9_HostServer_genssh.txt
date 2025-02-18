@@ -1,0 +1,9 @@
+#run the following command
+$ ssh-keygen -b 2048 -t rsa
+
+#create .ssh dir
+mkdir .ssh
+
+#move to new dir
+mv github_key.pub .ssh
+mv github_key .ssh

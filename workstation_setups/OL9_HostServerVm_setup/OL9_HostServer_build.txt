@@ -23,6 +23,9 @@ routes
 #make pacarey a sudoer
 sudo usermod -aG wheel pacarey
 
+install guest additions to have shared clipboard
+make sure the shared clipboard option is not enabled in Vbox until after installation + vm restart
+
 #install epel for snap packages
 dnf -y install oracle-epel-release-el9
 
@@ -35,3 +38,17 @@ sudo snap connect docker:home
 sudo groupadd docker
 sudo usermod -a -G docker $USER
 newgrp docker
+
+#install git
+#import git ssh key to /home/pacarey/.ssh folder
+sudo dnf install git
+
+#firewall configuration changes
+#everything on the local network will be allowed through the firewall
+sudo firewall-cmd --list-all
+sudo firewall-cmd --set-default-zone=trusted
+sudo firewall-cmd --zone=trusted --add-source=192.168.0.0/24
+sudo firewall-cmd --zone=trusted --add-service=http
+sudo firewall-cmd --zone=trusted --list-all
+sudo firewall-cmd --permanent --zone=trusted --set-target=ACCEPT
+
