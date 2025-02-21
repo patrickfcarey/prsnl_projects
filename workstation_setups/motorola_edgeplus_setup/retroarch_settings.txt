@@ -1,0 +1,30 @@
+1) settings -> userinterface 
+turn on show advanced settings
+
+2) add cores
+nintendo gba mgba 
+nintendo nes FCeumm
+nintendo snes bsnes
+nintendo n64 mupen64 plus gles3
+sony Bettle PSX HW
+
+3) settings -> saving
+turn on sort saves into folders by core name
+turn on save states into folders by core name
+turn off save state compression
+turn on save runtime log(aggregated)
+
+4) settings -> directory 
+set input remaps to set to Retroarch_Sync/input_remaps
+set playlists to set to Retroarch_Sync/Playlists/android/MotorollaEdge2003
+set favorites playlist to Retroarch_Sync/Playlists/android/MotorollaEdge2003
+set history playlist to Retroarch_Sync/Playlists/android/MotorollaEdge2003
+set runtime logs option to Retroarch_Sync/Playlists/logs
+set save files folder to Retroarch_Sync/Saves
+set save states folder to Retroarch_Sync/Save_States
+
+5) settings -> playlists
+turn on save runtime log(aggregate)
+turn on portable playlists
+
+6) copy schp5501.bin from Retroarch_Sync/BIOS to RetroArch/System
