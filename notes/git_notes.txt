@@ -1,0 +1,22 @@
+#get latest updates
+git pull origin/main
+
+#push changes to main
+git add .
+git commit -m "this thing finally works'
+git push origin/main
+
+#new branch
+git branch new_branch
+#switch to new branch
+git checkout new_branch
+
+#merge new_branch to main
+git fetch origin/main
+git checkout origin/main
+git merge --squash new_branch
+git commit -m "Merged new_branch"
+
+#get latest updates pushed to main added to new_branch
+git fetch origin/master
+git rebase origin/master

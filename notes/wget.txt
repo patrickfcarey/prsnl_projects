@@ -1,0 +1,11 @@
+wget \
+  --page-requisites \
+  --convert-links \
+  --span-hosts \
+  --no-directories \
+  https://www.example.com
+
+
+-> works for downloading an entire website, including all assets (even from cdn - because of --span-hosts)
+
+need to work better to block the virus websites
