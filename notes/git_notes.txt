@@ -14,9 +14,21 @@ git checkout new_branch
 #merge new_branch to main
 git fetch origin/main
 git checkout origin/main
-git merge --squash new_branch
+git merge --squash test_branch
 git commit -m "Merged new_branch"
 
 #get latest updates pushed to main added to new_branch
 git fetch origin/master
 git rebase origin/master
+#If you want to do it in one line without manually checking out the branch first, you can use:
+git rebase main test_branch
+
+
+#delete the branch after merging to main
+#To delete test_branch from your local repository:
+git branch -d test_branch
+#To delete test_branch from the remote repository:
+git push origin --delete test_branch
+
+
+
