@@ -30,5 +30,9 @@ git branch -d test_branch
 #To delete test_branch from the remote repository:
 git push origin --delete test_branch
 
+#push new repo to github 
+git init
+git remote add origin git@github.com:patrickfcarey/my-app.git
+
 
 

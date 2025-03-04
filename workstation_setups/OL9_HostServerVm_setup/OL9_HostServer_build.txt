@@ -52,3 +52,18 @@ sudo firewall-cmd --zone=trusted --add-service=http
 sudo firewall-cmd --zone=trusted --list-all
 sudo firewall-cmd --permanent --zone=trusted --set-target=ACCEPT
 
+
+#install node version manager
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+
+Running nvm use in the project directory will switch to the specified Node version. This is particularly useful for teams to ensure everyone uses the same Node version.
+
+#install github cli
+   sudo dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo
+
+
+   sudo dnf install -y gh
+   gh auth login
+> /home/pacarey/.ssh/github_key.pub
+
+

@@ -1,0 +1,42 @@
+$ npm install -g @angular/cli
+$ ng new my-app --defaults
+$ cd my-app
+$ ng serve
+
+Generate a Component:
+bash
+
+$ ng generate component greeting
+
+Edit greeting.component.html:
+html
+
+   <input [(ngModel)]="name" placeholder="Your name" />
+   <p>Hello, {{ name || 'stranger' }}!</p>
+
+greeting.component.ts:
+typescript
+
+   export class GreetingComponent {
+    name: string = '';
+   }
+
+
+Add to App:
+Update app.component.html:
+html
+
+   <app-greeting></app-greeting>
+
+Import FormsModule:
+   In app.module.ts:
+   typescript
+
+   import { FormsModule } from '@angular/forms';
+   @NgModule({
+     imports: [BrowserModule, FormsModule],
+     // ...
+   })
+
+Run it (ng serve)—type in the input, see the greeting update. That’s two-way binding in a nutshell.
+
