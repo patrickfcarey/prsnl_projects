@@ -67,3 +67,4 @@ Running nvm use in the project directory will switch to the specified Node versi
 > /home/pacarey/.ssh/github_key.pub
 
 
+#install open jdk and jre

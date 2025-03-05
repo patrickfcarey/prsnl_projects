@@ -1,0 +1,245 @@
+1. Pull the MySQL Docker Image
+First, you need to download the official MySQL image from Docker Hub. Open your terminal and run:
+
+bash
+
+    docker pull mysql:latest
+
+This pulls the latest version of MySQL. If you want a specific version (e.g., 8.0), replace latest with 8.0.
+
+2. Run a MySQL Container
+Now, let’s start a MySQL container. Use the following command:
+bash
+
+    docker run --name mysql-container -e MYSQL_ROOT_PASSWORD=my-secret-pw -p 3306:3306 -d mysql:latest
+
+--name mysql-container: Names the container (you can change this).
+
+-e MYSQL_ROOT_PASSWORD=my-secret-pw: Sets the root password (replace my-secret-pw with your preferred password).
+
+-p 3306:3306: Maps port 3306 on your host to port 3306 in the container (MySQL’s default port).
+
+-d: Runs the container in detached mode (in the background).
+
+mysql:latest: Specifies the image to use.
+
+3. Verify the Container is Running
+Check if the container is up:
+
+bash
+
+    docker ps
+
+You should see mysql-container listed with a status of "Up."
+4. Connect to MySQL
+You can connect to the MySQL instance in a few ways:
+Using Docker Exec (MySQL CLI in the container):
+bash
+
+    docker exec -it mysql-container mysql -uroot -p
+
+Enter the password (my-secret-pw) when prompted.
+
+Using a MySQL Client (e.g., MySQL Workbench, DBeaver, or CLI on your host):
+Host: localhost (or 127.0.0.1)
+
+Port: 3306
+
+Username: root
+
+Password: my-secret-pw
+
+Example with MySQL CLI installed on your host:
+bash
+
+    mysql -h 127.0.0.1 -u root -p
+
+5. (Optional) Persist Data
+By default, data in the container is lost when it’s stopped or removed. To persist data, use a Docker volume or bind mount:
+bash
+
+    docker run --name mysql-container -e MYSQL_ROOT_PASSWORD=my-secret-pw -p 3306:3306 -v mysql-data:/var/lib/mysql -d mysql:latest
+
+-v mysql-data:/var/lib/mysql: Creates a named volume (mysql-data) to store the database files.
+NOTE: Had to learn to escape the ! in my passwords with a \ - otherwise bash history expansion jumbles the input
+
+6. Create a Database
+Once connected to MySQL, you can create a database:
+sql
+
+    CREATE DATABASE mydatabase;
+    USE mydatabase;
+
+7. Stop or Remove the Container
+To stop the container:
+bash
+
+    docker stop mysql-container
+
+To start it again later:
+bash
+
+    docker start mysql-container
+
+To remove it (data is lost unless persisted):
+bash
+
+    docker rm mysql-container
+
+Example Workflow
+Here’s a full example:
+Run the container with persistent storage:
+bash
+
+    docker run --name mysql-container -e MYSQL_ROOT_PASSWORD=my-secret-pw -p 3306:3306 -v mysql-data:/var/lib/mysql -d mysql:latest
+
+Connect to it:
+bash
+
+    docker exec -it mysql-container mysql -uroot -p
+
+Create a database and table:
+sql
+
+    CREATE DATABASE myapp;
+    USE myapp;
+
+    CREATE TABLE person (
+    person_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    date_of_birth DATE,
+    active_ind TINYINT CHECK (active_ind IN (0, 1)),
+    name VARCHAR(255),
+    employee_id INT UNSIGNED UNIQUE,
+    PRIMARY KEY (person_id)
+    );
+
+    -- Insert 1: Basic entry with all fields
+    INSERT INTO person (date_of_birth, active_ind, name, employee_id)
+    VALUES ('1990-05-15', 1, 'Alice Johnson', 1001);
+    
+    -- Insert 2: Active person without employee_id
+    INSERT INTO person (date_of_birth, active_ind, name)
+    VALUES ('1985-12-03', 1, 'Bob Smith');
+    
+    -- Insert 3: Inactive person with employee_id
+    INSERT INTO person (date_of_birth, active_ind, name, employee_id)
+    VALUES ('1978-09-22', 0, 'Charlie Brown', 1002);
+    
+    -- Insert 4: Minimal entry (only required fields + name)
+    INSERT INTO person (date_of_birth, active_ind, name)
+    VALUES ('1995-01-30', 1, 'Diana Lee');
+    
+    -- Insert 5: Another active employee
+    INSERT INTO person (date_of_birth, active_ind, name, employee_id)
+    VALUES ('1988-07-19', 1, 'Eve Martinez', 1003);
+
+    SELECT * FROM users;
+
+Troubleshooting
+Container not starting? Check logs:
+bash
+
+    docker logs mysql-container
+
+Port conflict? Ensure port 3306 isn’t in use, or map a different host port (e.g., -p 3307:3306).
+
+Steps to Create a MySQL User and Grant Query Permissions
+1. Connect to the MySQL Container
+Use the root account to log into the MySQL instance running in the container:
+bash
+
+    docker exec -it mysql-container mysql -uroot -p
+
+When prompted, enter the root password (my-secret-pw).
+2. Create a New User
+Once connected, create a new user. For this example, let’s create a user named query_user with the password query_password. Run:
+sql
+
+    CREATE USER 'query_user'@'%' IDENTIFIED BY 'query_password';
+
+'query_user'@'%': The % allows the user to connect from any host. If you want to restrict it to localhost, use 'query_user'@'localhost'.
+
+IDENTIFIED BY 'query_password': Sets the password (replace it with your desired password).
+
+3. Grant Query Permissions
+Grant the user permission to query (e.g., run SELECT statements) on the mydatabase database. For read-only access:
+sql
+
+    GRANT SELECT ON mydatabase.* TO 'query_user'@'%';
+
+SELECT: Allows the user to run SELECT queries.
+
+mydatabase.*: Applies to all tables in the mydatabase database.
+
+If you want the user to have more permissions (e.g., INSERT, UPDATE, DELETE), you can extend the grant:
+sql
+
+    GRANT SELECT, INSERT, UPDATE, DELETE ON mydatabase.* TO 'query_user'@'%';
+
+4. Apply the Changes
+Flush the privileges to ensure the changes take effect:
+sql
+
+    FLUSH PRIVILEGES;
+
+5. Exit the MySQL Prompt
+Type EXIT; to leave the MySQL CLI.
+6. Test the New User
+Test the new user by connecting with their credentials. From your host (assuming MySQL CLI is installed):
+bash
+
+    mysql -h 127.0.0.1 -u query_user -p
+
+Enter query_password when prompted. Then, switch to the database and run a query:
+sql
+
+    USE mydatabase;
+    SHOW TABLES;  -- If you’ve created tables
+    SELECT * FROM users;  -- If you have a 'users' table from earlier
+
+If you’re still in the container, you can test it like this:
+bash
+
+    docker exec -it mysql-container mysql -uquery_user -p
+
+7. (Optional) Restrict Permissions Further
+If you want to limit the user to specific tables or columns:
+Specific table:
+sql
+
+    GRANT SELECT ON mydatabase.users TO 'query_user'@'%';
+
+Specific columns:
+sql
+
+    GRANT SELECT (id, name) ON mydatabase.users TO 'query_user'@'%';
+
+Example Workflow
+Here’s the full sequence assuming you’re starting fresh after connecting as root:
+sql
+
+    CREATE USER 'query_user'@'%' IDENTIFIED BY 'query_password';
+    GRANT SELECT ON mydatabase.* TO 'query_user'@'%';
+    FLUSH PRIVILEGES;
+    EXIT;
+
+Then test:
+bash
+
+    mysql -h 127.0.0.1 -u query_user -p
+    Enter password: query_password
+    mysql> USE mydatabase;
+    mysql> SELECT * FROM users;
+
+Troubleshooting
+“Access denied”: Ensure the password matches and the host (% or localhost) aligns with how you’re connecting. If using localhost in the grant, connect via 127.0.0.1, not a remote IP.
+
+“Unknown database”: Verify mydatabase exists (SHOW DATABASES; as root).
+
+Permissions not working: Double-check with SHOW GRANTS FOR 'query_user'@'%';.
+
+Why This Matters
+Creating a dedicated user with limited permissions (e.g., only SELECT) is a security best practice. It reduces the risk of accidental or malicious changes compared to using the root account for everything.
+Let me know if you need help testing this, adding more permissions, or integrating it with an application!
+
+ 
