@@ -68,3 +68,5 @@ Running nvm use in the project directory will switch to the specified Node versi
 
 
 #install open jdk and jre
+sudo dnf install java-21-openjdk -y
+sudo dnf install java-21-openjdk-devel -y
