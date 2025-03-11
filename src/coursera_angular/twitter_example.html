@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Twitter-like UI</title>
+    <style>
+        /* Reset default margins and padding */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Container to hold the three divs */
+        .container {
+            display: flex;
+            height: 100vh; /* Full viewport height */
+        }
+
+        /* Left sidebar (e.g., navigation) */
+        .left-sidebar {
+            width: 20%;
+            background-color: #f5f8fa;
+            padding: 20px;
+            border-right: 1px solid #e1e8ed;
+        }
+
+        /* Main content area (e.g., tweets) */
+        .main-content {
+            width: 50%;
+            background-color: #fff;
+            padding: 20px;
+            border-right: 1px solid #e1e8ed;
+        }
+
+        /* Right sidebar (e.g., trends) */
+        .right-sidebar {
+            width: 30%;
+            background-color: #f5f8fa;
+            padding: 20px;
+        }
+
+        /* Just some sample styling */
+        h2 {
+            margin-top: 0;
+        }
+        .post {
+            border-bottom: 1px solid #e1e8ed;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Sidebar -->
+        <div class="left-sidebar">
+            <h2>Navigation</h2>
+            <p>Home</p>
+            <p>Explore</p>
+            <p>Notifications</p>
+            <p>Messages</p>
+            <p>Profile</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <h2>Home</h2>
+            <div class="post">
+                <p><strong>User1:</strong> This is a sample tweet!</p>
+            </div>
+            <div class="post">
+                <p><strong>User2:</strong> Loving this simple UI example.</p>
+            </div>
+            <div class="post">
+                <p><strong>User3:</strong> Just some dummy content here.</p>
+            </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="right-sidebar">
+            <h2>Trends</h2>
+            <p>#ExampleTrend</p>
+            <p>#AnotherOne</p>
+            <p>#GrokRocks</p>
+        </div>
+    </div>
+</body>
+</html>

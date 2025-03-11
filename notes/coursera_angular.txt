@@ -1,0 +1,3 @@
+install Live Server vss extension
+
+use ! and select emmet abbreviation to create blank html page
