@@ -1,27 +1,29 @@
 let arr1 = [1,2,3,4,5,6];
 
-function rotateArray(input_array, k) {
+function rotateArray(arr, k) {
+    if (!arr || arr.length === 0 || k <= 0) return arr;
     
-    if(input_array.length> 0 || k <= 0) { 
-        return;
+    const n = arr.length;
+    k = k % n; // Normalize k if it's larger than array length
+    
+    // Helper function to reverse portion of array
+    function reverse(arr, start, end) {
+        while (start < end) {
+            [arr[start], arr[end]] = [arr[end], arr[start]]; // Swap using destructuring
+            start++;
+            end--;
+        }
     }
-    // normalize k
-    // k is the number of times the back number of the array
-    // has to be pushed to the front
-    k = k % input_array.length;
-
-    if(k == 0){
-        return;
-    }
-
-    for(let count = 0; count<(input_array.length-1)/2;count++) {
-        temp_var = input_array[count];
-        input_array[count] = input_array[input_array.length-1-count];
-        input_array[input_array.length-1-count]=temp_var;
-    }
-    return;
+    
+    // Three reversals
+    reverse(arr, 0, n - 1);    // Reverse entire array
+    reverse(arr, 0, k - 1);    // Reverse first k elements
+    reverse(arr, k, n - 1);    // Reverse remaining elements
+    
+    return arr;
 }
 
 // Test
-console.log(rotateArray(arr1, 2)); // Output: [4, 5, 1, 2, 3]
+let arr = [1, 2, 3, 4, 5];
+console.log(rotateArray(arr, 2)); // Output: [4, 5, 1, 2, 3]
 
