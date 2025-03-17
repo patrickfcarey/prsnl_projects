@@ -37,7 +37,7 @@ function reverseListRecursive(head) {
     // Reverse the links
     head.next.next = head;
     head.next = null;
-     return rest;
+    return rest;
 }
 
 // Example usage:
@@ -74,6 +74,7 @@ printList(reversedIterative);
 list = createSampleList();
 console.log("Original List:");
 printList(list);
+
 let reversedRecursive = reverseListRecursive(list);
 console.log("Reversed List (Recursive):");
 printList(reversedRecursive);
