@@ -25,19 +25,17 @@ function deepCopyList(head) {
 }
 
     
-function addTwoHelper(head1, head2, carry_over = 0){
+function addTwoNumbers(head1, head2, carry_over = 0){
         let temp_var = 0;
         
-        // if both heads are now null you return nothing, tail of the list
-        if(head1 == null && head2 == null){
+        // if both heads and carry_over are now null you return nothing, tail of the list
+        if(head1 == null && head2 == null && carry_over == 0){
             return null;            
-        }else if(head1 != null && head2 == null){
-            return new Node(head1.data + carry_over);
-        }else if(head2 != null && head1 == null){
-            return new Node(head2.data + carry_over);
         }
+        const val1 = head1 ? head1.data : 0;
+        const val2 = head2 ? head2.data : 0;
 
-        temp_var = head1.data + head2.data + carry_over;
+        temp_var = val1 + val2 + carry_over;
         
         if(temp_var >= 10 ) {
             carry_over = 1;
@@ -47,7 +45,11 @@ function addTwoHelper(head1, head2, carry_over = 0){
         }
         
         const answer_node = new Node(temp_var);
-        answer_node.next = addTwoHelper(head1.next, head2.next, carry_over);
+        answer_node.next = addTwoNumbers(
+            head1 ? head1.next : null,
+            head2 ? head2.next : null,
+            carry_over
+        );
         return answer_node;
 }
 
@@ -68,6 +70,18 @@ function createSampleList2() {
 
     return head;
 }
+function createSampleList3() {
+    let head = new Node(1);
+    return head;
+}
+
+function createSampleList4() {
+    let head = new Node(9);
+    head.next = new Node(9);
+    head.next.next = new Node(9);
+
+    return head;
+}
 
 function printList(head) {
     let current = head;
@@ -81,7 +95,11 @@ function printList(head) {
 
 let samplelist1 = createSampleList();
 let samplelist2 = createSampleList2();
+let samplelist3 = createSampleList3();
+let samplelist4 = createSampleList4();
 
+let mergedList = addTwoNumbers(deepCopyList(samplelist1),deepCopyList(samplelist2));
+printList(mergedList);
 
-let mergedList = addTwoHelper(deepCopyList(samplelist1),deepCopyList(samplelist2));
+mergedList = addTwoNumbers(deepCopyList(samplelist3),deepCopyList(samplelist4));
 printList(mergedList);
