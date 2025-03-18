@@ -37,6 +37,8 @@ function deepCopyList(head) {
 
 // given integer node_to_remove
 // remove node that is node_to_remove distance from the tail.next
+// as it is written, node_to_remove has to be > 0
+// node_to_remove = 1 then it will remove the tail 
 function removeNthNodeIteratively(head, node_to_remove){
     // Create a dummy node to handle edge cases (like removing head)
     let dummy = new Node(0);
@@ -47,10 +49,13 @@ function removeNthNodeIteratively(head, node_to_remove){
 
     // set fast_node to be node_to_remove distance from head/slow_node
     // this allows slow_node to be at Nth-1 slot when fast_node gets to the tail
+    // slow_node.next IS the reference to the nth slot - that is how we are deleting the nth slot, by overwriting slow_node.next
     for(let i = 0; i < node_to_remove; i++){
         fast_node = fast_node.next;
     }
-
+    
+    // iterate through linkedlist at the same pace
+    // will stop when fast_node is at the tail
     while(fast_node.next !== null){
         slow_node = slow_node.next;
         fast_node = fast_node.next;
