@@ -1,0 +1,67 @@
+Here's a step-by-step guide to install Go (Golang) on your Oracle Linux system:
+1. Check Your System
+Ensure your Oracle Linux installation is up to date. Open a terminal and run:
+bash
+    sudo yum update -y
+
+2. Download the Latest Go Version
+Visit the official Go website (https://go.dev/dl/) to find the latest stable version. As of March 26, 2025, you can download it directly via the terminal. For example, if the latest version is 1.22.1 (check the site for the current version), use:
+bash
+    wget https://go.dev/dl/go1.24.1.linux-amd64.tar.gz	
+Adjust the version number if a newer one is available.
+
+3. Extract the Archive
+Once downloaded, extract the tarball to /usr/local:
+bash
+    sudo tar -C /usr/local -xzf go1.24.1.linux-amd64.tar.gz	
+This places the Go binary in /usr/local/go.
+
+4. Set Up Environment Variables
+You need to add Go to your system’s PATH so you can run it from anywhere. Edit your shell profile file (e.g., ~/.bash_profile or ~/.bashrc):
+bash
+    nano ~/.bash_profile
+Add the following lines:
+bash
+    export PATH=$PATH:/usr/local/go/bin
+    export GOPATH=$HOME/go
+    export PATH=$PATH:$GOPATH/bin
+Save the file (Ctrl+O, Enter, Ctrl+X in nano) and apply the changes:
+bash
+    source ~/.bash_profile
+
+5. Verify Installation
+Check that Go is installed correctly by running:
+
+bash
+    go version
+You should see output like:
+go version go1.24.1.linux-amd64
+
+6. Optional: Test with a Simple Program
+Create a test file:
+
+bash
+    mkdir -p ~/go/src/hello
+    nano ~/go/src/hello/hello.go
+
+Add this code:
+    go
+    package main
+
+    import "fmt"
+
+    func main() {
+        fmt.Println("Hello, Go!")
+    }
+Save and run it:
+
+bash
+    go run ~/go/src/hello/hello.go
+You should see:
+Hello, Go!
+
+Troubleshooting
+If yum doesn’t work, ensure your Oracle Linux repositories are configured correctly (sudo yum repolist).
+For 32-bit systems, download the linux-386 tarball instead of linux-amd64.
+If you encounter permission issues, use sudo or check directory ownership.
+That’s it! You now have Go installed on your Oracle Linux system. Let me know if you run into any issues!
