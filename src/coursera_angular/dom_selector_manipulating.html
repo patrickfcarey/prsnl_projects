@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM manipulation</title>
+</head>
+<body>
+    <h1>DOM manipulation</h1>
+    <div>
+         <span id="one" name="First">First Span</span>
+         <span id="two" name="Second">Second Span</span>
+    </div>
+
+    <script> 
+    console.dir(document);
+    console.log(document.domain);
+    console.log(document.URL);
+    document.title = "DOM TITLES"
+    let body = document.body;
+    body.append("addiong more");
+
+    let div = document.createElement('div');
+    div.append('innertext');
+
+    body.append(div);
+
+    let spanOne = document.getElementById('one');
+    let spanTwo = document.getElementById('two');
+    console.log(spanOne.getAttribute('name'));
+    console.log(spanTwo.getAttribute('name'));
+    spanOne.setAttribute('name','abcde');
+
+    console.log(spanOne.getAttribute('name'));
+    spanOne.removeAttribute("name");
+    console.log(spanOne.getAttribute('name'));
+    spanTwo.classList.add("test-class");
+    spanTwo.classList.remove("test-class");
+
+    spanOne.style.color = "red";
+    spanTwo.style.backgroundColor = "black";
+    spanTwo.style.color = "white";
+
+    //body.removeChild(div);
+    //div.remove();
+
+
+
+    </script>
+
+</body>
+</html>
