@@ -15,6 +15,7 @@
         xhr.onreadystatechange = function(){
             if(xhr.readyState === XMLHttpRequest.DONE){
                 if(xhr.status === 200){
+                    
                     console.log(xhr.responseText);
                     const userData = JSON.parse(xhr.responseText);
                     userData.forEach((user) => {
@@ -22,8 +23,9 @@
                         const newUserText = document.createTextNode(user.name);
                         newUser.append(newUserText);
                         userList.appendChild(newUser);
+                    
                     });
-                }else{
+                } else{
                     console.log("there was a problem with the request");
                 }
             }

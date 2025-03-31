@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AJAX</title>
+</head>
+<body>
+    <h1>Users</h1>
+    <ul id="userList"></ul>
+    <script>
+        const userList = document.querySelector("#userList")
+
+        fetch('https://jsonplaceholder.typicode.com/users', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({ name: 'john' })
+        })
+        .then(response => response.json())
+        .then(data => console.log(data));
+
+
+        //two different responses because the API server handles GET and POST differently to this page
+        fetch('https://jsonplaceholder.typicode.com/users', {
+           method: 'GET',
+           headers: { 'Content-Type': 'application/json' },
+        })
+        .then(response => response.json())
+        .then(userData => userData.forEach((user) => {
+                        const newUser = document.createElement("li");
+                        const newUserText = document.createTextNode(user.name);
+                        newUser.append(newUserText);
+                        userList.appendChild(newUser);
+                    }));
+
+
+          /*          
+                    */
+    </script>
+</body>
+</html>
