@@ -53,6 +53,24 @@ sudo firewall-cmd --zone=trusted --list-all
 sudo firewall-cmd --permanent --zone=trusted --set-target=ACCEPT
 
 
+#Enable Logging in firewalld
+bash
+$ sudo nano /etc/firewalld/firewalld.conf
+LogDenied=all
+
+$ sudo firewall-cmd --reload
+
+Check Logs for firewalld:
+bash
+
+sudo journalctl -u firewalld
+
+sudo journalctl -u firewalld -f
+
+
+
+
+
 #install node version manager
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 
