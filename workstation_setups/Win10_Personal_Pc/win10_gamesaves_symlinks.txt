@@ -1,0 +1,2 @@
+# Diablo II Resurrection
+mklink /D "X:\My Drive\Retroarch\memory_cards\pc\Diablo II Resurrected" "C:\Users\Patrick\Saved Games\Diablo II Resurrected"
