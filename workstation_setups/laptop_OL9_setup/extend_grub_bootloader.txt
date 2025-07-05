@@ -1,0 +1,33 @@
+To extend the time the GRUB bootloader waits before booting the default OS on Oracle Linux 9, you can increase the GRUB timeout. Here's how to do it:
+
+🛠 Steps to Change GRUB Timeout:
+Open a terminal (you’ll need superuser privileges):
+
+sudo nano /etc/default/grub
+Find this line in the file:
+
+GRUB_TIMEOUT=5
+Change the value to however many seconds you want (e.g., 15):
+
+GRUB_TIMEOUT=15
+Save and exit the editor (in nano, press Ctrl+O, then Enter, then Ctrl+X).
+
+Regenerate the GRUB configuration:
+
+For BIOS systems:
+
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+For UEFI systems:
+
+sudo grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
+Oracle Linux uses the redhat directory for GRUB by default in UEFI.
+
+Reboot to test:
+
+sudo reboot
+✅ Optional: Confirm UEFI or BIOS
+To check whether you're using UEFI or BIOS:
+
+[ -d /sys/firmware/efi ] && echo "UEFI mode" || echo "Legacy BIOS mode"
+Let me know if you're dual-booting or using a custom bootloader layout, as the location of the GRUB config might vary slightly.
+
