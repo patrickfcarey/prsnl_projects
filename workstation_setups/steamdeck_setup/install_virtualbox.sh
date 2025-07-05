@@ -21,7 +21,7 @@ echo "[*] Adding current user to vboxusers group..."
 sudo usermod -aG vboxusers $USER
 
 # Install Extension Pack (optional)
-EXT_PACK="Oracle_VM_VirtualBox_Extension_Pack-7.0.18.vbox-extpack"
+EXT_PACK="Oracle_VM_VirtualBox_Extension_Pack-7.1.10.vbox-extpack"
 if [ -f "$EXT_PACK" ]; then
     echo "[*] Installing Extension Pack..."
     sudo VBoxManage extpack install --replace "$EXT_PACK"
