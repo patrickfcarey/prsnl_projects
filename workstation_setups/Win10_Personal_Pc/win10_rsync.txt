@@ -1,0 +1,19 @@
+Setup wsl
+
+powershell 
+$ wsl --install
+
+update computer as necessary, when in Ubuntu run these commands to update, upgrade, install rsync
+
+$ sudo apt update
+$ sudo apt upgrade
+$ sudo apt install rsync
+
+create directory in wsl for network drive (assumes you already have bound Drive to Z:)
+
+$ sudo mkdir /mnt/z
+$ sudo mount -t drvfs Z: /mnt/z
+
+run rsync commands (maybe create .sh utility to run next time)
+$ rsync -varP source target
+$ rsync -varP /mnt/z/root/media_2x/vms /mnt/m/root/media_2x/
