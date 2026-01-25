@@ -1,0 +1,56 @@
+sudo dnf install -y kernel-devel-$(uname -r) kernel-headers-$(uname -r)
+
+📦 Step 1 — Add the OpenZFS Repository
+
+Download and install the OpenZFS repo RPM:
+
+sudo dnf install -y https://zfsonlinux.org/epel/zfs-release-2-3.el9.noarch.rpm
+
+
+This adds a zfs.repo file to /etc/yum.repos.d/ with the OpenZFS repo and its GPG key.
+
+
+🧩 Step 2 — Choose Packaging Style
+Install DKMS ZFS packages:
+
+sudo dnf config-manager --enable zfs
+sudo dnf install -y zfs zfs-dkms
+
+
+During installation DKMS will build the ZFS kernel modules.
+
+
+
+🔌 Step 3 — Load the ZFS Kernel Module
+
+Once installed:
+
+sudo modprobe zfs
+
+
+Check that it loaded:
+
+lsmod | grep zfs
+
+
+If you see nothing or get an error like Module zfs not found, it usually means:
+
+The kernel module didn’t build (with DKMS) or
+
+There isn’t a matching kmod package for your exact kernel.
+
+In that case, try reinstalling or switch to DKMS.
+
+📌 Optional — Enable Services at Boot
+
+To ensure ZFS services (import/mount) run on boot:
+
+sudo systemctl enable zfs-import-cache zfs-mount zfs.target
+
+
+🧪 Verifying Your Installation
+
+Check ZFS utilities and version:
+
+zfs --version
+zpool --version

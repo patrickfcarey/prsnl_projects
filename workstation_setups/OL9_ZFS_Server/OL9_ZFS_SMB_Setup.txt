@@ -1,0 +1,174 @@
+Got it — on Linux, ZFS does not provide SMB by itself.
+You expose a ZFS dataset over SMB using Samba. ZFS just handles storage; Samba handles sharing.
+
+Here’s the clean, modern way to do it on Oracle Linux 9.5.
+
+Big picture (so it makes sense)
+
+ZFS dataset → directory
+
+Samba → exports that directory over SMB
+
+systemd → keeps it running
+
+No magic ZFS SMB toggle like on TrueNAS / Solaris — this is the Linux way.
+
+1️⃣ Install Samba
+sudo dnf install -y samba samba-client samba-common
+
+
+Enable and start the service:
+
+sudo systemctl enable --now smb nmb
+
+
+Check status:
+
+systemctl status smb
+
+2️⃣ Create a ZFS dataset for SMB
+
+Example dataset:
+
+sudo zfs create tank/smb
+
+
+Set sane defaults for SMB workloads:
+
+sudo zfs set compression=lz4 tank/smb
+sudo zfs set atime=off tank/smb
+sudo zfs set xattr=sa tank/smb
+sudo zfs set acltype=posixacl tank/smb
+
+
+Check mountpoint:
+
+zfs get mountpoint tank/smb
+
+
+Default will be:
+
+/tank/smb
+
+3️⃣ Set permissions (important)
+
+Decide how you want access to work.
+
+Option A: Single user (simplest, most common)
+
+Create a user:
+
+sudo useradd smbuser
+sudo passwd smbuser
+
+
+Own the dataset:
+
+sudo chown -R smbuser:smbuser /tank/smb
+chmod 755 /tank/smb
+
+
+Add the user to Samba:
+
+sudo smbpasswd -a smbuser
+sudo smbpasswd -e smbuser
+
+Option B: Multiple users via group
+sudo groupadd smbgroup
+sudo usermod -aG smbgroup user1
+sudo usermod -aG smbgroup user2
+sudo chown -R root:smbgroup /tank/smb
+chmod 2770 /tank/smb
+
+4️⃣ Configure the SMB share
+
+Edit Samba config:
+
+sudo nano /etc/samba/smb.conf
+
+
+Add at the bottom:
+
+[tank]
+   path = /tank/smb
+   browseable = yes
+   read only = no
+   valid users = smbuser
+   create mask = 0664
+   directory mask = 0775
+
+
+Save and restart Samba:
+
+sudo systemctl restart smb
+
+5️⃣ SELinux (this WILL block SMB if you skip it)
+
+Oracle Linux has SELinux enforcing by default.
+
+Label the ZFS mount for Samba:
+
+sudo semanage fcontext -a -t samba_share_t "/tank/smb(/.*)?"
+sudo restorecon -Rv /tank/smb
+
+
+If semanage is missing:
+
+sudo dnf install -y policycoreutils-python-utils
+
+6️⃣ Open firewall
+sudo firewall-cmd --permanent --add-service=samba
+sudo firewall-cmd --reload
+
+7️⃣ Test locally
+smbclient -L localhost -U smbuser
+
+
+You should see your [tank] share listed.
+
+8️⃣ Connect from a client
+From Linux:
+smbclient //server-ip/tank -U smbuser
+
+From Windows:
+\\server-ip\tank
+
+From macOS:
+smb://server-ip/tank
+
+Common gotchas (worth knowing)
+🔹 ZFS permissions vs Samba
+
+ZFS does not override UNIX permissions.
+If access fails, always check:
+
+ls -ld /tank/smb
+getfacl /tank/smb
+
+🔹 Performance tuning (optional)
+
+For large files (media, backups):
+
+sudo zfs set recordsize=1M tank/smb
+
+
+For lots of small files:
+
+sudo zfs set recordsize=128K tank/smb
+
+What not to do
+
+❌ Don’t export the pool root (/tank)
+❌ Don’t disable SELinux globally
+❌ Don’t use /dev/sdX anywhere
+❌ Don’t mix ACL models unless you know why
+
+If you tell me:
+
+Windows vs Linux vs mixed clients
+
+home NAS vs backups vs media vs VM storage
+
+need for Time Machine or Windows ACLs
+
+I can dial in ACLs, performance, and Samba settings exactly for your setup.

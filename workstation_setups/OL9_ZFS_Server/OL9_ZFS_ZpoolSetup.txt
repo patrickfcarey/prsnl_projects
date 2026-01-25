@@ -1,0 +1,141 @@
+Run this to see the correct drives you are wanting to add to the zpool
+
+lsblk -o NAME,SIZE,MODEL,SERIAL
+
+grab the disk-id (example below) and wipe metadata
+
+
+ls -l /dev/disk/by-id/ | grep -i ata
+
+
+2️⃣ (Optional but recommended) Wipe old metadata
+
+This avoids weird import issues later.
+
+sudo wipefs -a /dev/disk/by-id/ata-DRIVE1
+sudo wipefs -a /dev/disk/by-id/ata-DRIVE2
+
+sudo wipefs -a /dev/disk/by-id/ata-ST24000NM000C-3WD103_ZXA0LWDQ
+sudo wipefs -a /dev/disk/by-id/ata-ST24000NM000C-3WD103_ZXA0NMDL
+
+
+If they were previously used for RAID/LVM:
+
+sudo sgdisk --zap-all /dev/disk/by-id/ata-ST24000NM000C-3WD103_ZXA0LWDQ
+sudo sgdisk --zap-all /dev/disk/by-id/ata-ST24000NM000C-3WD103_ZXA0NMDL
+sudo sgdisk --zap-all /dev/disk/by-id/ata-DRIVE1
+
+
+3️⃣ Create the mirrored zpool (best practices)
+
+Here’s a sane default pool creation command for large HDDs:
+
+sudo zpool create \
+  -o ashift=12 \
+  -o autotrim=on \
+  tank \
+  mirror \
+  /dev/disk/by-id/ata-ST24000NM000C-3WD103_ZXA0LWDQ \
+  /dev/disk/by-id/ata-DRIVE2
+
+Why these options matter
+
+ashift=12 → optimal for modern 4K-sector drives (never changeable later)
+
+autotrim=on → safe for modern HDDs & SSDs (helps SMR too)
+
+mirror → redundancy; either disk can fail
+
+📛 Replace tank with whatever pool name you want.
+
+4️⃣ Verify pool health
+zpool status
+zpool list
+
+
+You should see:
+
+state: ONLINE
+  mirror-0
+    ata-DRIVE1  ONLINE
+    ata-DRIVE2  ONLINE
+
+
+5️⃣ Set useful dataset defaults (highly recommended)
+
+Instead of using the pool root directly, create datasets:
+
+sudo zfs set compression=lz4 tank
+sudo zfs set atime=off tank
+sudo zfs set xattr=sa tank
+sudo zfs set acltype=posixacl tank
+
+sudo zfs set compression=lz4 tank/backups
+sudo zfs set atime=off tank/backups
+sudo zfs set xattr=sa tank/backups
+sudo zfs set acltype=posixacl tank/backups
+
+
+Then create datasets as needed:
+
+sudo zfs create tank/data
+sudo zfs create tank/backups
+
+
+Check:
+
+zfs list
+
+
+6️⃣ (Optional) Set mountpoints
+
+By default, ZFS will mount under /tank/...
+
+If you prefer something like /data:
+
+sudo zfs set mountpoint=/data tank/data
+
+
+Create the directory if needed:
+
+sudo mkdir -p /data
+
+7️⃣ Start a scrub schedule (very important)
+
+Manual scrub:
+
+sudo zpool scrub tank
+
+to see status:
+sudo zpool status tank
+
+
+Recommended: monthly scrubs via cron or systemd timer.
+
+Example cron (monthly):
+
+sudo crontab -e
+#every month at 2 am, first of the month
+0 2 1 * * /sbin/zpool scrub tank
+every other month at 2am, first of the month
+0 2 1 */2 * /sbin/zpool scrub tank
+every 3 months at 3 am, fifth of the month
+0 3 5 */3 * /sbin/zpool scrub tank
+
+
+
+Capacity & expectations
+
+Usable size ≈ one disk (mirror)
+
+You gain:
+
+silent corruption protection
+
+easy disk replacement
+
+fast reads
+
+To replace a failed disk later:
+
+zpool replace tank <old-disk> <new-disk>

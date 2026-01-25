@@ -1,0 +1,12 @@
+#EPEL
+sudo dnf install oracle-epel-release-el$(rpm -E %rhel)
+
+# install snap package, if not found enable EPEL repos
+sudo dnf install snapd -y
+
+#enable this for classic compatability
+sudo ln -s /var/lib/snapd/snap /snap
+
+# enable snap service
+sudo systemctl enable --now snapd.socket
+

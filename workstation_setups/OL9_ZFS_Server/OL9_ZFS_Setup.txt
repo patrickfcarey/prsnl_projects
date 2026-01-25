@@ -1,0 +1,52 @@
+
+Had to install OL9 in Raid1 Setup - across two ssds
+using mdadm to --add or --remove drives
+
+Had to download and install RHEK kernels 9.5
+[pacarey@localhost ~]$ sudo dnf install -y kernel kernel-headers kernel-devel
+
+update grub.cfg here before running mkconfig to generate files
+[pacarey@localhost ~]$ sudo nano /etc/default/grub
+
+
+this command will update rebuild the grub.cfg on the correct boot location for OL9
+[pacarey@localhost ~]$ sudo grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
+
+
+Grab the boot location from here 
+[pacarey@localhost ~]$ sudo grubby --info=ALL
+
+set boot location
+[pacarey@localhost ~]$ sudo grubby --set-default /boot/vmlinuz-5.14.0-503.11.1.el9_5.x86_64
+
+check kernel 
+[pacarey@localhost ~]$ sudo grubby --default-kernel
+
+[pacarey@localhost ~]$ ls /boot/loader/entries
+
+view the grubenv
+[pacarey@localhost ~]$ sudo vi /boot/efi/EFI/redhat/grubenv
+
+
+delete the grubenv 
+[pacarey@localhost ~]$ sudo rm -f /boot/efi/EFI/redhat/grubenv
+recreate it
+[pacarey@localhost ~]$ sudo grub2-editenv /boot/efi/EFI/redhat/grubenv create
+
+
+take the saved_entry from here to 
+[pacarey@localhost ~]$ sudo grub2-editenv list
+[pacarey@localhost ~]$ sudo grub2-editenv /boot/efi/EFI/redhat/grubenv set saved_entry=d56d099018384b809f91b83a59feb2a3-5.14.0-503.11.1.el9_5.x86_64
+
+check the kernel that booted
+[pacarey@localhost ~]$ cat /proc/cmdline
+
+#add network drive
+
+sudo dnf install cifs-utils  
+
+sudo mount -t cifs //192.168.68.74/DrivePool_Backup /mnt/z \
+  -o username=pacarey
+
+sudo rsync -varP /mnt/z/root2/completed_torrents /tank/backups/
+sudo rsync -varP /mnt/z/root2/media_2x /tank/backups/
