@@ -1,0 +1,12 @@
+[Unit]
+Description=Supermicro IPMI Fan Override
+After=network.target
+Wants=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/ipmi-fan-override.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

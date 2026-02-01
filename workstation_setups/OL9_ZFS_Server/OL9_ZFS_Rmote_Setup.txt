@@ -1,0 +1,98 @@
+# Check if openssh-server is already installed
+
+$ rpm -q openssh-server
+
+If it’s not installed, install it:
+
+$ sudo dnf install -y openssh-server
+
+
+Step 2
+2️⃣ Enable and start the SSH service
+
+Oracle Linux 9 uses systemd:
+sudo systemctl enable sshd
+sudo systemctl start sshd
+
+# add user to ssh group
+sudo vi /etc/ssh/sshd_config
+
+#Verify none of these block your user:
+
+AllowUsers username
+# or
+AllowGroups sshusers
+
+
+sudo systemctl reload sshd
+
+step 3 (if making keys)
+ Set up SSH key access (recommended)
+
+On the client machine:
+
+ssh-keygen
+ssh-copy-id username@server_ip
+
+
+Or manually on the server:
+
+sudo mkdir -p /home/username/.ssh
+sudo vi /home/username/.ssh/authorized_keys
+
+
+Permissions must be exact:
+
+sudo chown -R username:username /home/username/.ssh
+sudo chmod 700 /home/username/.ssh
+sudo chmod 600 /home/username/.ssh/authorized_keys
+
+
+
+4. Test SSH login
+
+From client:
+
+ssh username@localhost
+
+
+If it fails, debug:
+
+ssh -vvv username@localhost or server_ip
+
+
+And check server logs:
+
+sudo journalctl -u sshd -xe
+
+
+
+Install Xrdp
+step 1
+sudo dnf install -y oracle-epel-release-el9
+
+sudo dnf install -y xrdp
+
+3. Enable and start xrdp
+sudo systemctl enable xrdp --now
+sudo systemctl status xrdp
+
+
+4. Open the firewall
+sudo firewall-cmd --add-port=3389/tcp --permanent
+sudo firewall-cmd --reload
+
+Confirm:
+
+sudo firewall-cmd --list-ports
+
+5. SELinux (important on OL9)
+
+Usually works out of the box, but if connections fail:
+
+sudo setsebool -P xrdp_can_connect_all_unreserved_ports 1
+
+
+To troubleshoot:
+
+sudo ausearch -m AVC -ts recent

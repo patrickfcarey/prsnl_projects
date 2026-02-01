@@ -1,0 +1,25 @@
+DISK INVENTORY
+==============
+
+Format:
+Bay | Model | Size | Serial | Power-On Hours | Notes
+
+01 | Samsung 870 QVO | 1TB | S5RANX0M123456 | 12,430h | Boot mirror
+02 | Samsung 870 QVO | 1TB | S5RANX0M654321 | 12,412h | Boot mirror
+
+03 | WD Red Plus     | 8TB | VKJ123AB       | 31,210h | tank raidz2
+04 | WD Red Plus     | 8TB | VKJ124AB       | 31,198h | tank raidz2
+05 | WD Red Plus     | 8TB | VKJ125AB       | 31,205h | tank raidz2
+06 | WD Red Plus     | 8TB | VKJ126AB       | 31,187h | tank raidz2
+07 | WD Red Plus     | 8TB | VKJ127AB       | 31,201h | tank raidz2
+08 | WD Red Plus     | 8TB | VKJ128AB       | 31,194h | tank raidz2
+
+Spare policy:
+- Keep at least 1 cold spare (8TB or larger)
+- Replace drives > 40k POH proactively
+
+SMART notes:
+- All WD drives: periodic UDMA CRC errors observed in past → checked cabling
+- No reallocated sectors as of last scrub
+
+LAST SMART REVIEW: 2026-01-10

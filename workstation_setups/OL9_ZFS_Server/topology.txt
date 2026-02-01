@@ -1,0 +1,42 @@
+STORAGE TOPOLOGY
+================
+
+Pools
+-----
+
+tank
+- Layout: raidz2 (6-wide)
+- Bays: 03–08
+- Ashift: 12
+- Autotrim: on
+- Scrub: monthly (1st Sunday)
+
+boot-pool
+- Layout: mirror
+- Bays: 01–02
+- Purpose: OS only
+
+Controllers
+-----------
+
+LSI 9300-8i
+- PCIe slot: CPU slot 2
+- Firmware: P16 IT
+- Connected bays: 01–08
+- Cables:
+  - Port 0 → Bays 01–04
+  - Port 1 → Bays 05–08
+
+Notes
+-----
+
+- Bays 09–12 currently unused
+- Chassis supports SATA/SAS LED blink
+- zpool status uses /dev/disk/by-partlabel/bayXX
+
+References
+----------
+Bay map: /etc/storage/zfs-bays.txt
+Disk inventory: /etc/storage/disks.txt
+
+LAST UPDATED: 2026-01-15

@@ -1,0 +1,46 @@
+ZFS BAY MAP
+===========
+This file should be located in /etc/storage/zfs-bays.txt
+Host: OL9_ZFS
+CPU:  Intel(R) Xeon(R) CPU E5-2695 v4 @ 2.10GHz
+Cores: 16
+Threads: 32
+CPU max MHz:          3300.0000
+CPU min MHz:          1200.0000
+Memory: 24 GB
+Chassis: Corsair 
+Backplane: LOL, NAH
+Controller: Onboard, + Cheap Amazon Sata Controller for EXT_BAY 5
+Blu-ray burner: HL-DT-ST BD-RE  WH14NS40  1.03  /dev/sr0
+
+Summary of usage: Workstation to host virtual machines (future expansion of memory plans), Host ZFS Datasets, Host SMB Server, 
+
+Bay numbering:
+- Left to right
+- Bottom row first
+
+Internal Bay  Disk ID (by-id)                                   Notes
+---- ------------------------------------------------ --------------------------------
+01            ata-Samsung_SSD_840_PRO_Series_S1ATNSAFA15859T    mdadm:  (mirror-0)
+02            ata-Samsung_SSD_840_PRO_Series_S1ATNSAFA17336L    mdadm:  (mirror-0)
+
+03            ata-ST24000NM000C-3WD103_ZXA0NMDL                 Pool: tank (mirror-0 vdev1)
+04            ata-ST24000NM000C-3WD103_ZXA0LWDQ                 Pool: tank (mirror-0 vdev1)
+05            ata-ST24000NM000C-3WD103_ZXA0ND16                 Pool: tank (mirror-1 vdev2)
+06            ata-ST24000NM000C-3WD103_ZXA18SA6                 Pool: tank (mirror-1 vdev2)
+
+External Bay
+01            tbd                  Pool: tank (mirror-2) vdev3
+02            tbd                  Pool: tank (mirror-2) vdev3
+03
+04
+05
+
+IMPORTANT NOTE: 
+Remember External Bay 05 is routed throught that shitty Sata controller, same with the Blu-ray drive
+
+LED control:
+- Use: sas2ircu 0 locate <bay> on
+- Or: ledctl locate=/dev/disk/by-id/...
+
+LAST UPDATED: 2026-02-01

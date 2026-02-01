@@ -4,7 +4,7 @@ sudo dnf install -y kernel-devel-$(uname -r) kernel-headers-$(uname -r)
 
 Download and install the OpenZFS repo RPM:
 
-sudo dnf install -y https://zfsonlinux.org/epel/zfs-release-2-3.el9.noarch.rpm
+sudo dnf install -y https://zfsonlinux.org/epel/zfs-release-2-4.el9.noarch.rpm
 
 
 This adds a zfs.repo file to /etc/yum.repos.d/ with the OpenZFS repo and its GPG key.
@@ -54,3 +54,83 @@ Check ZFS utilities and version:
 
 zfs --version
 zpool --version
+
+
+
+update to 2.4.0
+🧹 Step 1: Remove the old DKMS version (but NOT your pools)
+
+This does not touch your zpools.
+
+$   sudo dkms remove zfs/2.2.9 --all
+
+
+Example:
+
+$   sudo dkms remove zfs/2.1.13 --all
+
+
+Then remove the old source tree:
+
+$   sudo rm -rf /usr/src/zfs-*
+
+
+(Optional but recommended)
+
+$   sudo modprobe -r zfs
+
+sudo dnf config-manager --enable zfs-testing
+sudo dnf install zfs zfs-dkms zfs-test
+sudo modprobe zfs
+
+If everything goes well, you’ll see:
+
+zfs/2.4.0, <kernel>, installed
+
+🚀 Step 5: Load ZFS and verify
+sudo modprobe zfs
+zfs version
+
+3️⃣ Make sure it autoloads on future boots
+
+DKMS usually sets this up automatically, but on Oracle Linux:
+
+sudo systemctl enable zfs-import-cache
+sudo systemctl enable zfs-mount
+sudo systemctl enable zfs-import.target
+
+
+You should now see 2.4.0 for both kernel module and userland.
+
+Your pools should import automatically. If not:
+
+sudo zpool import
+
+version lock
+
+sudo dnf install -y 'dnf-command(versionlock)'
+
+your installed ZFS packages
+rpm -q zfs zfs-dkms zfs-test
+
+
+Example output:
+
+zfs-2.4.0-1.el9.x86_64
+zfs-dkms-2.4.0-1.el9.noarch
+zfs-test-2.4.0-1.el9.x86_64
+
+
+3️⃣ Lock the packages to the current version
+$ sudo dnf versionlock add zfs-2.4.0 zfs-dkms-2.4.0 zfs-test-2.4.0
+This prevents DNF from upgrading ZFS packages, even if a newer version appears in any enabled repo (like zfs-testing).
+
+[user_root@localhost ~]$ uname -r
+rpm -q kernel kernel-devel
+5.14.0-503.11.1.el9_5.x86_64
+kernel-devel-5.14.0-503.11.1.el9_5.x86_64
+
+sudo dnf versionlock add kernel-5.14.0-503.11.1.el9_5.x86_64 kernel-devel-5.14.0-503.11.1.el9_5.x86_64
+
+lastly, remove testing repo
+sudo dnf config-manager --set-disabled zfs-testing

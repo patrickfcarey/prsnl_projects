@@ -1,3 +1,37 @@
+in installation media -> ctrl + alt + f2 
+$ lsblk -o NAME,SIZE,TYPE,MODEL,SERIAL
+
+3A. Remove filesystem + RAID + LVM metadata (recommended)
+$ wipefs -a /dev/sd$
+
+3B. Zap GPT/MBR completely (very reliable)
+$ sgdisk --zap-all /dev/sd$
+
+
+Example:
+
+$ sgdisk --zap-all /dev/nvme0n1
+
+
+Then:
+
+$ wipefs -a /dev/sd$
+
+
+This is my go-to combo when disks cause install errors.
+
+Option 4: Zero the disk (slow but absolute)
+
+Only needed for compliance or badly corrupted disks.
+
+dd if=/dev/zero of=/dev/sd$ bs=1M status=progress
+
+
+⚠️ Very slow on large disks
+⚠️ Totally destroys everything
+
+Usually overkill unless required by policy.
+
 
 Had to install OL9 in Raid1 Setup - across two ssds
 using mdadm to --add or --remove drives
