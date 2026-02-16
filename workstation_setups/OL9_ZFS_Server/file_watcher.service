@@ -1,0 +1,15 @@
+[Unit]
+Description=Debounced File Watcher Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/file-watcher.sh
+Restart=always
+RestartSec=60
+# Optional: limit resources if desired
+ CPUQuota=50%
+ MemoryMax=500M
+
+[Install]
+WantedBy=multi-user.target

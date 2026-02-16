@@ -1,0 +1,201 @@
+#1 📦 Install 7-Zip on Oracle Linux 9
+
+```bash
+sudo dnf install epel-release -y
+sudo dnf install p7zip p7zip-plugins -y
+```
+
+Verify:
+
+```bash
+7z
+```
+
+---
+
+
+Perfect 👍 — for **system-wide usage** on **Oracle Linux 9.7 (RHCK)** connecting to **Google Drive**, here is a clean production-ready setup.
+
+---
+
+# ✅ 1️⃣ Install rclone System-Wide
+
+If not already installed:
+
+```bash
+sudo dnf install -y curl p7zip p7zip-plugins
+sudo -v ; curl https://rclone.org/install.sh | sudo bash
+```
+
+Verify:
+
+```bash
+rclone version
+```
+
+Binary will be installed in:
+
+```
+/usr/bin/rclone
+```
+
+---
+
+# ✅ 2️⃣ Create a Dedicated Service Account (Recommended)
+
+For system-wide usage, avoid using a personal user account.
+
+```bash
+sudo useradd -r -m -d /etc/rclone -s /sbin/nologin rclone
+```
+
+Create config directory:
+
+```bash
+sudo mkdir -p /etc/rclone
+sudo chown rclone:rclone /etc/rclone
+sudo chmod 750 /etc/rclone
+```
+
+---
+
+# ✅ 3️⃣ Configure rclone for Google Drive
+
+Run configuration as the rclone user:
+
+```bash
+sudo -u rclone rclone config
+```
+
+### Interactive Steps
+
+1. `n` → New remote
+2. Name it: `gdrive`
+3. Storage type → type `drive`
+4. Client ID → **leave blank** (or use custom if you have one)
+5. Client Secret → **leave blank**
+6. Scope → choose:
+
+   * `1` (full access) usually fine
+7. Root folder ID → blank
+8. Service account file → blank (unless using Google Workspace SA)
+9. Edit advanced config → `n`
+10. Auto config → `y`
+11. not a shared team drive
+
+You will get a URL → open it in a browser → login → copy verification code back.
+
+After completion, config file will be stored at:
+
+```
+/etc/rclone/rclone.conf
+```
+
+Verify permissions:
+
+```bash
+sudo chmod 600 /etc/rclone/rclone.conf
+sudo chown rclone:rclone /etc/rclone/rclone.conf
+```
+
+---
+
+# ✅ 4️⃣ Test Connection
+
+```bash
+sudo -u rclone rclone lsd gdrive:
+```
+
+You should see your Google Drive folders listed.
+
+---
+
+# ✅ 5️⃣ Optional: Create Mount Point (If You Need Filesystem Access)
+
+Create mount directory:
+
+```bash
+sudo mkdir -p /mnt/gdrive
+sudo chown rclone:rclone /mnt/gdrive
+```
+
+Test mount:
+
+```bash
+sudo -u rclone rclone mount gdrive: /mnt/gdrive --daemon
+```
+
+Check:
+
+```bash
+ls /mnt/gdrive
+```
+
+---
+
+# ✅ 6️⃣ Optional: Create Systemd Service (Recommended for Production)
+
+Create file:
+
+```bash
+sudo nano /etc/systemd/system/rclone-gdrive.service
+```
+
+Paste:
+
+```ini
+[Unit]
+Description=Rclone Google Drive Mount
+After=network-online.target
+
+[Service]
+Type=simple
+User=rclone
+Group=rclone
+ExecStart=/usr/bin/rclone mount gdrive: /mnt/gdrive \
+  --config=/etc/rclone/rclone.conf \
+  --allow-other \
+  --dir-cache-time=72h \
+  --vfs-cache-mode=writes
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable + start:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable rclone-gdrive
+sudo systemctl start rclone-gdrive
+```
+
+Check status:
+
+```bash
+systemctl status rclone-gdrive
+```
+
+---
+
+# 🔐 Important Security Notes
+
+* If this is a server (no GUI), use:
+
+  ```bash
+  rclone config --no-browser
+  ```
+* For enterprise use (Google Workspace), a **service account JSON file** is better than interactive login.
+* Always restrict `/etc/rclone/rclone.conf` to `600`.
+
+---
+
+If you'd like, I can now provide:
+
+* 🔒 Google Workspace service account setup (more secure for servers)
+* ⚡ Performance-tuned mount options for high-load servers
+* 📦 Backup automation script
+* 🔄 One-way or bi-directional sync strategy
+
+Tell me your server purpose (backup, file sharing, app storage, etc.) and I’ll optimize the setup.

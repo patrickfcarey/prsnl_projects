@@ -1,0 +1,101 @@
+Yes — you can absolutely wrap this debounced watcher script as a **systemd service**, and that’s actually the cleanest way to run it persistently, start at boot, and recover if it crashes.
+
+Here’s a full example based on the long-debounce version:
+
+---
+
+## **1. Save your watcher script**
+
+Save it as, for example, `/usr/local/bin/file-watcher.sh`:
+
+```bash
+#!/bin/bash
+WATCH_FILE="/path/to/largefile"
+DEBOUNCE_SECONDS=15  # adjust based on expected transfer size
+
+while true; do
+    # Wait for the first modification
+    inotifywait -e modify "$WATCH_FILE" >/dev/null 2>&1
+
+    # Wait for file to stabilize
+    last_mod=$(stat -c %Y "$WATCH_FILE")
+    while true; do
+        sleep $DEBOUNCE_SECONDS
+        new_mod=$(stat -c %Y "$WATCH_FILE")
+        if [[ "$new_mod" == "$last_mod" ]]; then
+            break
+        fi
+        last_mod=$new_mod
+    done
+
+    # Run your update
+    /usr/local/bin/update-script.sh
+done
+```
+
+Make it executable:
+
+```bash
+sudo chmod +x /usr/local/bin/file-watcher.sh
+```
+
+---
+
+## **2. Create a systemd service file**
+
+Create `/etc/systemd/system/file-watcher.service`:
+
+```ini
+[Unit]
+Description=Debounced File Watcher Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/file-watcher.sh
+Restart=always
+RestartSec=5
+# Optional: limit resources if desired
+# CPUQuota=50%
+# MemoryMax=500M
+
+[Install]
+WantedBy=multi-user.target
+```
+
+* `Restart=always` ensures it will automatically restart if it crashes.
+* `RestartSec=5` avoids rapid restart loops.
+* You can optionally add resource limits if the script could spike CPU or memory.
+
+---
+
+## **3. Enable and start the service**
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable file-watcher.service
+sudo systemctl start file-watcher.service
+```
+
+Check status:
+
+```bash
+sudo systemctl status file-watcher.service
+```
+
+You should see it **running**, waiting for file changes, and ready to debounce large transfers.
+
+---
+
+✅ **Key benefits of using systemd here:**
+
+1. Auto-start at boot.
+2. Automatic recovery on failure.
+3. Centralized logging (via `journalctl -u file-watcher.service`).
+4. Easy to adjust resource limits and dependencies.
+
+---
+
+If you want, I can also show a **systemd-native version** using `PathModified=` that **doesn’t need a bash loop or inotifywait at all** — it’s even more efficient for huge files and debounced transfers. It’s a very clean approach for production setups.
+
+Do you want me to show that?

@@ -1,0 +1,199 @@
+how to install virtual box on oracle linux 9.7
+
+Got you 👍 Installing VirtualBox on Oracle Linux 9.7 is pretty straightforward, but there are a couple of gotchas around kernel modules. Here’s the clean, reliable way.
+
+1. Prep the system
+
+Update first and install the required build tools.
+
+sudo dnf update -y
+sudo dnf install -y gcc make perl kernel-devel kernel-headers dkms elfutils-libelf-devel
+
+
+👉 Important:
+kernel-devel must match your running kernel. Double-check:
+
+uname -r
+rpm -q kernel-devel
+
+
+If they don’t match, reboot into the latest kernel:
+
+sudo reboot
+
+2. Add the VirtualBox repository
+
+Oracle Linux uses the RHEL-compatible repo from Oracle.
+
+sudo dnf install -y oraclelinux-developer-release-el9
+sudo dnf config-manager --enable ol9_developer
+
+
+Now install VirtualBox:
+
+sudo dnf install -y VirtualBox-7.0
+sudo dnf versionlock add VirtualBox-7.0\*
+
+
+(7.0 is the current stable branch as of OL9; if a newer one shows up, you can install that instead.)
+
+3. Build and load kernel modules
+
+After install, build the VirtualBox kernel modules:
+
+sudo /sbin/vboxconfig
+
+
+If everything’s good, you’ll see:
+
+VirtualBox kernel modules installed successfully
+
+4. Add your user to the vboxusers group
+
+Without this, USB and some devices won’t work.
+
+sudo usermod -aG vboxusers $USER
+
+
+Log out and log back in (or reboot).
+
+5. Install the Extension Pack (recommended)
+
+This enables USB 2/3, RDP, NVMe, etc.
+
+Check your installed version:
+
+VBoxManage --version
+
+
+Download the matching Extension Pack from:
+https://www.virtualbox.org/wiki/Downloads
+
+Install it:
+
+sudo VBoxManage extpack install Oracle_VM_VirtualBox_Extension_Pack-7.0.x.vbox-extpack
+
+
+Accept the license when prompted.
+
+6. SELinux note (important on OL9)
+
+If VirtualBox fails to start VMs, SELinux may be blocking it.
+
+Check:
+
+getenforce
+
+
+If it’s Enforcing and you hit issues, try:
+
+sudo setsebool -P virt_use_execmem 1
+
+
+(Disabling SELinux entirely is not recommended.)
+
+7. Start VirtualBox
+
+From GUI:
+
+virtualbox &
+
+
+Or via the application menu.
+
+
+
+
+
+
+Ah yeah — that error is VirtualBox saying *“I don’t get exclusive access to the CPU’s virtualization features because KVM already grabbed them.”* Totally fixable 👍
+
+This happens **on Linux** when **KVM is enabled** and you try to run **VirtualBox**. Only one hypervisor can use VMX root mode at a time.
+
+---
+
+## Quick reality check
+
+You’ve got three options (pick one):
+
+1. **Use KVM instead of VirtualBox** (best performance, very Linux-native)
+2. **Temporarily disable KVM** so VirtualBox can run
+3. **Permanently disable KVM** if you always use VirtualBox
+
+If you want VirtualBox *right now*, do option 2.
+
+---
+
+## Option 2: Temporarily disable KVM (no reboot sometimes)
+
+### 1️⃣ Check if KVM is loaded
+
+```bash
+lsmod | grep kvm
+```
+
+You’ll usually see `kvm_intel` or `kvm_amd`.
+
+### 2️⃣ Unload KVM modules
+
+Run **one** of these depending on your CPU:
+
+**Intel**
+
+```bash
+sudo modprobe -r kvm_intel kvm
+```
+
+**AMD**
+
+```bash
+sudo modprobe -r kvm_amd kvm
+```
+
+If it succeeds, launch VirtualBox again — it often works immediately 🚀
+
+If it says modules are “in use”, you’ll need a reboot or stop libvirt first.
+
+---
+
+## Option 3: Permanently disable KVM (VirtualBox always wins)
+
+### 1️⃣ Blacklist KVM modules
+
+```bash
+sudo nano /etc/modprobe.d/blacklist-kvm.conf
+```
+
+Add:
+
+**Intel**
+
+```
+blacklist kvm
+blacklist kvm_intel
+```
+
+**AMD**
+
+```
+blacklist kvm
+blacklist kvm_amd
+```
+
+### 2️⃣ Update initramfs
+for specific kernel
+```bash
+sudo dracut -f /boot/initramfs-$(uname -r).img $(uname -r)
+```
+for all kernels
+```bash
+sudo dracut -f --regnerate-all
+```
+
+
+### 3️⃣ Reboot
+
+```bash
+sudo reboot
+```
+

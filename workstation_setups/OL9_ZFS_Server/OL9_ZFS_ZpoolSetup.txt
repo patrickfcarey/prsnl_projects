@@ -1,5 +1,5 @@
 Run this to see the correct drives you are wanting to add to the zpool
-
+$ lsblk -o NAME,TYPE,SIZE,MOUNTPOINT,FSTYPE,PATH,FSAVAIL,FSSIZE,FSUSED,FSUSE%,SIZE,PARTUUID
 $ lsblk -o NAME,SIZE,MODEL,SERIAL
 
 grab the disk-id (example below) and wipe metadata
@@ -155,4 +155,9 @@ how to add additional drives to new vdev, join to current zpool
 $ zpool add tank mirror /dev/disk/by-id/ata-disk4 /dev/disk/by-id/ata-disk5
 
 now run zfs rewrite -p
-$ zfs rewrite -P /pool/dataset
+$ zfs rewrite -r /tank/backups
+
+# for very long commands
+$ nohup zfs rewrite -r /tank/bankups &
+check on the status
+$ zpool status

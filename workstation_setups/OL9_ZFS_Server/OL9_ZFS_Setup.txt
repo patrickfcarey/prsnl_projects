@@ -79,8 +79,8 @@ check the kernel that booted
 
 sudo dnf install cifs-utils  
 
-sudo mount -t cifs //192.168.68.74/DrivePool_Backup /mnt/z \
-  -o username=pacarey
+sudo mount -t cifs //IP_ADDRESS/DrivePool_Backup /mnt/z \
+  -o username=test-user
 
 sudo rsync -varP /mnt/z/root2/completed_torrents /tank/backups/
 sudo rsync -varP /mnt/z/root2/media_2x /tank/backups/
